@@ -3,40 +3,35 @@ package com.github.upperbound.secret_santa.model;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 import org.springframework.security.core.GrantedAuthority;
 
+@Accessors(chain = true)
 @Getter
 @Setter
 @Entity
-@Table(name = "participant_role")
+@Table(name = "PARTICIPANT_ROLE")
 public class ParticipantRole implements GrantedAuthority {
-    @Transient
-    public static final ParticipantRole SUPERADMIN = new ParticipantRole();
-    @Transient
-    public static final ParticipantRole ADMIN = new ParticipantRole();
-    @Transient
-    public static final ParticipantRole USER = new ParticipantRole();
-
-    static {
-        SUPERADMIN.role = Role.SUPERADMIN;
-        ADMIN.role = Role.ADMIN;
-        USER.role = Role.USER;
+    public enum Role {
+        SUPERADMIN,
+        ADMIN,
+        USER
     }
+    @Transient
+    public static final ParticipantRole SUPERADMIN = new ParticipantRole().setRole(Role.SUPERADMIN);
+    @Transient
+    public static final ParticipantRole ADMIN = new ParticipantRole().setRole(Role.ADMIN);
+    @Transient
+    public static final ParticipantRole USER = new ParticipantRole().setRole(Role.USER);
 
     @Id
     @Enumerated(EnumType.STRING)
-    @Column(name = "id", length = 30)
+    @Column(name = "ID", length = 30)
     private Role role;
 
     @Override
     public String getAuthority() {
         return role.name();
-    }
-
-    public enum Role {
-        SUPERADMIN,
-        ADMIN,
-        USER
     }
 
     @Override
@@ -45,5 +40,10 @@ public class ParticipantRole implements GrantedAuthority {
         if (o == null || getClass() != o.getClass()) return false;
         ParticipantRole that = (ParticipantRole) o;
         return role == that.role;
+    }
+
+    @Override
+    public int hashCode() {
+        return role.hashCode();
     }
 }

@@ -2,6 +2,10 @@ package com.github.upperbound.secret_santa.service;
 
 import lombok.Getter;
 
+/**
+ * <p> Exception that may occur on a business layer </p>
+ * @author Vladislav Tsukanov
+ */
 @Getter
 public class ServiceException extends Exception {
     private final ExceptionCode exceptionCode;

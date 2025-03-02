@@ -1,63 +1,25 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6"
-      lang="ru">
+      th:lang="#{html.lang}">
 <head>
-    <meta charset="UTF-8">
-    <title>@html.head.title.main@</title>
-    <link rel="stylesheet" type="text/css" media="all" href="@html.head.css.common@" />
-    <script src="@html.head.js.common@"></script>
+    <th:block th:insert="~{head-common :: head-common}"></th:block>
 </head>
 <body>
-<div th:insert="~{navbar :: menu}"></div>
-<span class="error-message" th:if="${errMessage != null && !errMessage.isBlank()}" th:text="${errMessage}">errMessage</span>
+<th:block th:insert="~{navbar :: menu}"></th:block>
 <main class="main-table">
     <div class="left-box"></div>
     <div class="container container-box">
-        <div class="container-sub-box">
-            <h2>@html.home.h2.common-info@</h2>
-        </div>
+        <th:block th:utext="#{html.home.welcome-structure}"></th:block>
         <div class="font-size-130">
-            <p class="info">
-                @html.home.p1@
+            <p th:if="${participantsWithinGroups != null && participantsWithinGroups > 0}"
+               th:utext="#{html.home.participants-count} + '&lt;b&gt;' + ${participantsWithinGroups} +'&lt;/b&gt;'"
+               class="info">
             </p>
-            <p>
-                @html.home.p2@
+            <p sec:authorize="!isAuthenticated()" class="info">
+                <a th:href="@{sign_up}" class="btn btn-link"
+                   th:text="#{html.sign-in.link.register}"/>
             </p>
-            <p>
-                @html.home.p3@ <b>@html.home.p3.bold1@</b>
-            </p>
-            <p>
-                @html.home.p4@
-            </p>
-            <p>
-                <b>@html.home.p5@</b>
-            </p>
-            <ul>
-                <li>@html.home.l1.el1.part1@ <b>@html.home.l1.el1.part2@</b></li>
-                <li><b>@html.home.l1.el2.part1@</b> @html.home.l1.el2.part2@</li>
-                <li>@html.home.l1.el3.part1@ <b>@html.home.l1.el3.part2@</b> @html.home.l1.el3.part3@</li>
-                <li>@html.home.l1.el4.part1@</li>
-                <li>@html.home.l1.el5.part1@</li>
-            </ul>
-            <p>
-                @html.home.p6@
-            </p>
-            <p>@html.home.p7@</p>
-            <p th:if="${participantsCount != null && participantsCount > 0}" class="info">
-                @html.home.p8@: <b th:text="${participantsCount}"></b>
-            </p>
-            <p sec:authorize="!isAuthenticated()" th:if="${availableGroups != null && !availableGroups.isEmpty()}" class="info">
-                <a th:href="@{sign_up}" class="btn btn-link">
-                    @html.sign-in.link.register@
-                </a>
-            </p>
-            <p sec:authorize="!isAuthenticated()" th:if="${availableGroups == null || availableGroups.isEmpty()}" class="info">
-                @html.home.p9@
-            </p>
-<!--        <p></p>-->
-<!--        <p></p>-->
-<!--        <p>@html.home.p.s@</p>-->
         </div>
     </div>
 </main>

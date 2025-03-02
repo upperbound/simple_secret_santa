@@ -1,0 +1,1 @@
+org.springframework.boot.env.EnvironmentPostProcessor=com.github.upperbound.secret_santa.config.ConfigPostProcessor

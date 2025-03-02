@@ -2,10 +2,25 @@
 <Configuration name="config" status="warn">
     <Appenders>
         <Console name="stdout">
-            <ThresholdFilter level="INFO"/>
-<!--            <PatternLayout pattern="%date [%thread] %-5level %logger - %notEmpty{[%MDC{session_user}:%MDC{service_action}]} %msg%n"/>-->
+            <ThresholdFilter level="WARN"/>
             <PatternLayout pattern="%date [%thread] %-5level %logger -%equals{ user[%MDC{session_user}]}{ user[]}{}%equals{ action[%MDC{service_action}]}{ action[]}{} %msg%n"/>
         </Console>
+        <RollingFile name="file-log"
+                      fileName="secret_santa.log"
+                      filePattern="logs/full.log-%d{yyyy-MM-dd}.%i.log.gz">
+        <ThresholdFilter level="INFO"/>
+            <PatternLayout pattern="%date [%thread] %-5level %logger -%equals{ user[%MDC{session_user}]}{ user[]}{}%equals{ action[%MDC{service_action}]}{ action[]}{} %msg%n"/>
+        <Policies>
+            <TimeBasedTriggeringPolicy interval="1"/>
+            <SizeBasedTriggeringPolicy size="200 MB"/>
+        </Policies>
+        <DefaultRolloverStrategy>
+            <Delete basePath="logs" maxDepth="1">
+                <IfFileName glob="full.log-*.log.gz"/>
+                <IfLastModified age="P7D"/>
+            </Delete>
+        </DefaultRolloverStrategy>
+    </RollingFile>
     </Appenders>
 
     <Loggers>
@@ -14,6 +29,7 @@
 
         <Root level="debug">
             <AppenderRef ref="stdout"/>
+            <AppenderRef ref="file-log"/>
         </Root>
     </Loggers>
 </Configuration>

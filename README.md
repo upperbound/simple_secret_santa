@@ -1,106 +1,110 @@
-# Тайный дед мороз
+[![ru](src/main/resources/static/images/ru.png)](README.ru.md)
 
-### Описание
-Версия JDK - 21\
-[Параметры приложения](./src/main/resources/application.yaml) - содержит все основные настройки приложения\
-[Параметры html шаблонов](./src/main/resources/templates.properties) - используется для установки значений в html шаблоны
-мавеном при сборке и не включается в итоговую сборку. Сами шаблоны лежат в папке
-**resources/templates** (используется Thymeleaf для server-side генерации html страниц)\
+# Simple implementation of a self-hosting office-driven Secret Santa
+
+### Description
+Java version - 21\
+[Application properties](./src/main/resources/application.properties) - contains all common application properties\
+[Localization bundles](./src/main/resources/messages.properties) - used for localization of the application.\
+The html-page templates are located in **resources/templates** (Thymeleaf has been used for server-side html generation)\
 \
-Так как используется Spring Boot, то при автоконфигурации Spring уже знает, что:
-- шаблоны находятся в **resources/templates** (и доступны **view** уже с этими именами в контроллерах)
-- статичные ресурсы находятся в **resources/static** (которые он паблишит сразу по нужному адресу -
-по структуре папок внутри, например **http://localhost:8080/css/common.css**)
-- sql скрипты находятся в корне приложения 
+Since Spring Boot is used, during auto-configuration Spring already knows that:
+- the templates are located in **resources/templates** (and **view** is already available with these names in the controllers).
+- static resources are located in **resources/static** (which will be published to the specific address
+according to the folder structure inside, e.g. **http://localhost:8080/css/common.css**).
+- sql are located in the root classpath.
 
-### Структура приложения
+### Build
+The build prepares a `zip` archive that contains the [startup script](./image/run.sh), main `jar` + dependencies,
+as well as a directory with the necessary resources and a configuration file.
 
+### Application settings
+All the basic settings are located in the `config` folder - it contains all the `messages**.properties` files
+for localization, the [settings file](./src/main/resources/config.properties), and the resources available
+in the application context.
+In order to add additional localization, you need to create a new file `messages_%LOCALE_NAME%.properties`,
+where [%LOCALE_NAME%](https://en.wikipedia.org/wiki/IETF_language_tag) is the localization name,
+and also add an image for the drop-down list into `resources/images`.\
+There are several profiles available for launching the application:
+- `ignore-notifications` - disables sending notifications by mail and disables usage of the mail server settings.
+- `no-password` - disables custom input of a password and always sets it with a default value (for test/demo)
+- `uuid-password` - disables custom input of a password and generates it randomly based on **UUID**, after which
+sends it within a notification (if notification sending is not disabled)
+
+[Settings file](./src/main/resources/config.properties) **MUST** be edited depends on environment where this application
+will be started.\
+Description of all necessary settings:
+```properties
+# Duration for participant's 'password reset' action
+app.action-token-duration=2H
+# keystore with a secret key to encrypt/decrypt any data within DB
+app.crypto.ks-location=classpath:keystore-secret.jks
+# password to 'ks-location'
+app.crypto.ks-password=default
+# alias of the key contained in 'ks-location'
+app.crypto.ks-key-alias=key-secret
+# key password for a 'ks-key-alias'
+app.crypto.ks-key-password=default
+# if no suitable key provided above, then this salt will be used as an AES key to encrypt/decrypt any data within DB
+app.crypto.key-salt=any_value
+# password which will be set for all participants if 'no-password' spring profile is active
+app.default-pass=0
+# email sender for notifications
+app.mail.from=secret_santa_no_reply@my-office.com
+# delay in seconds between attempts to send failed mail notifications, default 30
+app.mail.resend-delay=30
+# number of attempts to send failed mail notifications (if set to -1 the attempts will be infinite), default 1
+app.mail.resend-attempts=1
+# regex-pattern for allowed participant's email format, default .*
+app.mail.allowed-regex=.*
+# validation error message for participant's email
+app.mail.allowed-err-message=email '%s' does not belong to any corporate domain=@my-office.com / @my-office.org
+# DNS or IP of this app (e.g. https://secret-santa.my-office.com) - will be used within notifications
+app.server.url=http://${server.address}:${server.port}
+# the only way to grant/revoke 'superadmin' role is through the following options during startup:
+# list of users which role will be set to 'superadmin'
+app.superadmins: "{'user1@my-office.com','user2@my-office.com'}"
+# list of users which role will be set to 'user'
+app.users: "{'user3@my-office.com','user4@my-office.com'}"
+# example server settings
+server.address=localhost
+server.port=8080
+server.ssl.enabled=false
+server.ssl.certificate=classpath:certificate-ec.crt
+server.ssl.certificate-private-key=classpath:private-ec-key.pem
+# Comma separated profiles for application behavior. Described above. 
+spring.profiles.active=
+# The name of the database and the user under whom the new database and all the necessary tables will be created.
+spring.datasource.db-name=santa-db
+spring.datasource.username=admin
+spring.datasource.password=secretpass
+# Settings for connecting to the mail server.
+# They will be used to send notifications.
+spring.mail.protocol=smtps
+spring.mail.host=mail.my-office.com
+spring.mail.port=465
+spring.mail.username=user
+spring.mail.password=userpass
+spring.mail.properties.mail.smtp.auth=true
+spring.mail.properties.mail.smtp.starttls.enable=true
+spring.mail.properties.mail.smtp.ssl.protocols=TLSv1.2
+spring.mail.properties.mail.smtp.ssl.trust=my-office.com
+```
+
+### Application structure
 **com.github.upperbound.secret_santa.**
-- **config** - все конфиги для приложения и
-[PostInitializer](src/main/java/com/github/upperbound/secret_santa/config/PostInitializer.java) (для установки роли супер админа)
-- **model** - слой ORM
-- **repository** - слой DAO
-- **service** - вся бизнес-логика приложения, где происходит создание пользователей,
-проведение розыгрыша, отправка писем и т.д.
-- **util** - общие утилитарные классы
-- **web** - все веб-контроллеры которые связаны с html-шаблонами и которые обрабатывают **GET** и **POST** запросы
-вызывая бизнес-логику
+- **config** - all application settings and
+  [PostInitializer](./src/main/java/com/github/upperbound/secret_santa/config/PostInitializer.java) (for superadmin role)
+- **model** - ORM layer
+- **repository** - DAO layer
+- **service** - all application's business logic, where users are being created,
+results are being drawn, notifications are being sent, etc.
+- **util** - common utility classes
+- **web** - all web controllers that process **GET** and **POST** requests by invoking business logic
 
-Небольшие уточнения:
-- [MvcConfig](src/main/java/com/github/upperbound/secret_santa/config/MvcConfig.java) - реализует **ApplicationListener**
-чтобы запомнить порт на котором мы стартанули, нужно будет для полного адреса приложения
-совместно с параметром **app.server.hostname**, при условии, что приложение доступно не по **https**
-- [SecurityConfig](src/main/java/com/github/upperbound/secret_santa/config/SecurityConfig.java) -
-прописаны все правила доступа к ресурсам приложения. Для того, чтобы Spring Security работал как мы хотим,
-интерфейс [ParticipantDetails](src/main/java/com/github/upperbound/secret_santa/model/ParticipantDetails.java)
-экстендит **UserDetails**,
-а [ParticipantService](src/main/java/com/github/upperbound/secret_santa/service/ParticipantService.java)
-экстендит **UserDetailsService**,
-чтобы спринг знал наших пользователей и использовал наши методы для получения этой информации и авторизации
-- [логирование](./src/main/resources/log4j2.xml) не настроено в файл, следовательно делать через **nohup**
-
-Информация по ролям:
-- **USER** - роль задается по умолчанию, пользователю доступна вкладка **Профиль**
-- **ADMIN** - можно установить из интерфейса (либо при запуске через **-Dapp.admins**)
-доступны вкладки **Информация об участниках** и **Профиль** (возможность проводить конкурс
-только в своем подразделении и из действий только **Удалить участника**)
-- **SUPERADMIN** - можно установить только при запуске приложения, доступны все вкладки и все действия
-(убрать эту роль можно также только при запуске, передав этого пользователя в качестве **-Dapp.admins**,
-то есть сделав просто **ADMIN**, а потом в интерфейсе можно поменять роль на **USER**)
-
-Информация по действиям:
-- **Переместить в другое подразделение** - перемещает участника в выбранную группу.
-Если в группе, **из которой** перемещается участник, **проведен конкурс**, то подопечный перемещаемого участника переходит по наследству
-тайному деду морозу этого участника. Если в группе, **в которою** перемещается участник, **проведен конкурс**, то
-выбирается случайный участник из этой группы, подопечный этого случайного участника достается перемещаемому участнику,
-а сам перемещаемый участник достается в качестве подопечного случайно выбранному. Во всех этих случаях происходит соответствующая
-рассылка писем о том, что поменялся подопечный (при условии, что включено "получать уведомления")
-- **Удалить участника** - удаляет участника и его аккаунт, если в группе проведен конкурс, то подопечный
-удаляемого участника переходит по наследству тайному деду морозу этого участника
-- **Поменять роль** - меняет роль с ADMIN на USER или наоборот
-
-### Запуск приложения
-Основные параметры которые **НУЖНО** передавать при запуске:
-- **-Dapp.mail.do-send=true** - включить отправку писем пользователям, по умолчанию **false** и письма не отправляются
-- **-Dserver.port=2024** - порт, на котором запустится приложение
-- **-Dspring.datasource.password=1234** - задать пароль для БД. При первом запуске он создает новую БД используя скрипты
-[схемы](./src/main/resources/schema.sql) и [данных](./src/main/resources/data.sql), а также устанавливает указанный пароль.
-Для последующего входа в БД будет использоваться этот пароль
-- **-Dapp.superadmins="{'i.ivanov@e-soft.ru','i.petrov@e-soft.ru'}"** - список пользователей, которым будет проставлена роль
-супер админа. При первом запуске БД пустая, следовательно нужно запустить приложение, зарегистрироваться,
-и перезапустить для установки роли данным пользователям
-
-Итоговый скрипт будет выглядеть примерно так:
-```
-#!/bin/bash
-nohup /opt/jdk-17.0.2/bin/java \
--Dapp.mail.do-send=true \
--Dserver.port=2024 \
--Dspring.datasource.password=secretpass \
--Dapp.superadmins="{'i.ivanov@e-soft.ru','i.petrov@e-soft.ru'}" \
--jar anonymous_grandfather_frost-1.0.jar &
-```
-
-## Дополнительная информация по Spring, которую предлагает сам Spring
-
-### Reference Documentation
-
-For further reference, please consider the following sections:
-
-* [Official Apache Maven documentation](https://maven.apache.org/guides/index.html)
-* [Spring Boot Maven Plugin Reference Guide](https://docs.spring.io/spring-boot/docs/3.2.1-SNAPSHOT/maven-plugin/reference/html/)
-* [Spring Data JPA](https://docs.spring.io/spring-boot/docs/3.2.1-SNAPSHOT/reference/htmlsingle/index.html#data.sql.jpa-and-spring-data)
-* [Java Mail Sender](https://docs.spring.io/spring-boot/docs/3.2.1-SNAPSHOT/reference/htmlsingle/index.html#io.email)
-* [Spring Web](https://docs.spring.io/spring-boot/docs/3.2.1-SNAPSHOT/reference/htmlsingle/index.html#web)
-* [Spring Security](https://docs.spring.io/spring-boot/docs/3.2.1-SNAPSHOT/reference/htmlsingle/index.html#web.security)
-
-### Guides
-
-The following guides illustrate how to use some features concretely:
-
-* [Accessing Data with JPA](https://spring.io/guides/gs/accessing-data-jpa/)
-* [Serving Web Content with Spring MVC](https://spring.io/guides/gs/serving-web-content/)
-* [Securing a Web Application](https://spring.io/guides/gs/securing-web/)
-* [Spring Boot and OAuth2](https://spring.io/guides/tutorials/spring-boot-oauth2/)
-* [Authenticating a User with LDAP](https://spring.io/guides/gs/authenticating-ldap/)
-
+Roles info:
+- **USER** - it is set by default. When creating a new group, the user who creates it becomes its administrator
+(has the ability to edit the group, the number of the participants and can draw the results). Administrator
+has the ability to grant/revoke this role to any other user in this group.
+- **SUPERADMIN** - it can only be installed when the application is launched, all tabs and all actions
+in all groups are available (you can also remove this role only at startup by passing this user as **app.users**)

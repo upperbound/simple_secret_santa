@@ -1,71 +1,38 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6"
-      lang="ru">
+      th:lang="#{html.lang}">
 <head>
-    <meta http-equiv="Content-Type" content="text/html" charset="UTF-8">
-    <title>@html.head.title.main@</title>
-    <link rel="stylesheet" type="text/css" media="all" href="@html.head.css.common@" />
-    <script src="@html.head.js.common@"></script>
+    <th:block th:insert="~{head-common :: head-common}"></th:block>
 </head>
 <body>
-<div th:insert="~{navbar :: menu}"></div>
-<span class="error-message" th:if="${errMessage != null && !errMessage.isBlank()}" th:text="${errMessage}">errMessage</span>
+<th:block th:insert="~{navbar :: menu}"></th:block>
 <main class="main-table">
     <div class="left-box"></div>
     <div class="container container-box">
         <div class="container-sub-box">
-            <h2>@html.participant.h2.p-info@</h2>
+            <h2 th:text="#{html.participant.h2.p-info}"></h2>
         </div>
         <div class="font-size-130">
             <form th:action="@{participant}" th:object="${participant}" method="post">
                 <div class="form-group">
-                    <label for="group">@html.label.group@</label>
-                    <input th:field="*{group.description}" id="group" type="text" readonly />
+                    <label for="email" th:text="#{html.label.email2}"></label>
+                    <input th:field="*{email}" id="email" type="email" readonly />
                 </div>
                 <div class="form-group">
-                    <label for="email">@html.label.email2@</label>
-                    <input th:field="*{email}" id="email" type="text" readonly />
+                    <label for="info_1" th:text="#{html.label.info}"></label>
+                    <textarea th:name="info" th:field="*{info}" id="info_1" class="validation" rows="1" cols="60" ></textarea>
                 </div>
-                <div class="form-group">
-                    <label for="info_1">@html.label.info@</label>
-                    <textarea th:name="info" th:field="*{info}" id="info_1" rows="1" cols="60" ></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="wishes">@html.label.wishes@</label>
-                    <textarea th:name="wishes" th:field="*{wishes}" id="wishes" rows="4" cols="60" ></textarea>
-                </div>
-                <label for="notify">@html.label.receive-notifications@</label>
-                <input th:name="receiveNotifications" th:field="*{receiveNotifications}" id="notify" type="checkbox" class="form-control" />
+                <label for="notify" th:text="#{html.label.receive-notifications}"></label>
+                <input th:name="receiveNotifications" th:field="*{receiveNotifications}" id="notify" type="checkbox" />
                 <button th:name="action" th:value="update"
-                        onclick="return clickConfirm('@html.participant.button.update-info.confirm@')"
-                        type="submit" class="btn btn-primary">@html.participant.button.update-info@</button>
-                <button th:if="${!participant.group.hasDrawn}" th:name="action" th:value="delete"
-                        onclick="return clickConfirm('@html.participant.button.delete.confirm@')"
-                        type="submit" class="btn btn-primary">@html.participant.button.delete@</button>
+                        th:confirm-message="#{html.participant.button.update-info.confirm}"
+                        onclick="return clickConfirm(this.getAttribute('confirm-message'))"
+                        type="submit" class="btn btn-primary" th:text="#{html.participant.button.update-info}"></button>
+                <button th:name="action" th:value="delete"
+                        th:confirm-message="#{html.participant.button.delete.confirm}"
+                        onclick="return clickConfirm(this.getAttribute('confirm-message'))"
+                        type="submit" class="btn btn-primary" th:text="#{html.participant.button.delete}"></button>
             </form>
-        </div>
-        <div th:if="${participant.group.hasDrawn}" th:object="${participant.toGiftTo}" class="form-group">
-            <div class="container-sub-box">
-                <h2>@html.participant.h2.2g2-info@</h2>
-            </div>
-            <div class="font-size-130">
-                <div class="form-group">
-                    <label for="email_to">@html.label.email2@</label>
-                    <input th:field="*{email}" id="email_to" type="text" readonly />
-                </div>
-                <div class="form-group">
-                    <label for="info_to">@html.label.info@</label>
-                    <input th:field="*{info}" id="info_to" type="text" readonly />
-                </div>
-                <div class="form-group">
-                    <label for="wishes_to">@html.participant.label.wishes@</label>
-                    <textarea th:field="*{wishes}" id="wishes_to" rows="4" cols="50" readonly></textarea>
-                </div>
-            </div>
-        </div>
-        <div th:if="${!participant.group.hasDrawn}" class="form-group">
-            <label class="font-size-130" for="wishes">@html.participant.label.waiting@</label>
         </div>
     </div>
 </main>

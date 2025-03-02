@@ -1,52 +1,66 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6"
-      lang="ru">
+      th:lang="#{html.lang}">
 <head>
-    <meta charset="UTF-8">
-    <title>@html.head.title.main@</title>
-    <link rel="stylesheet" type="text/css" media="all" href="@html.head.css.common@" />
-    <script src="@html.head.js.common@"></script>
+    <th:block th:insert="~{head-common :: head-common}"></th:block>
+    <script type="text/javascript" th:validation-message="#{html.label.password-validation-message}">
+        let scripts = document.getElementsByTagName("script");
+        let validationMessage = scripts[scripts.length - 1].getAttribute("validation-message");
+        $(document).ready(function () {
+            $("#notify").prop("checked", true);
+            passwordsValidation(validationMessage);
+        })
+    </script>
 </head>
 <body>
-<div th:insert="~{navbar :: menu}"></div>
-<span class="error-message" th:if="${errMessage != null && !errMessage.isBlank()}" th:text="${errMessage}">errMessage</span>
+<th:block th:insert="~{navbar :: menu}"></th:block>
 <main class="main-table">
     <div class="left-box"></div>
     <div class="container container-box">
         <div class="container-sub-box">
-            <h2>@html.sign-up.h2.registration@</h2>
+            <h2 th:text="#{html.sign-up.h2.registration}"></h2>
         </div>
         <div class="font-size-130">
             <form th:action="@{sign_up}" th:object="${participant}" method="post">
-                <label>@html.sign-up.label.password-will-be-generated@</label>
+                <label th:if="${!customPassword}" th:text="#{html.sign-up.label.password-will-be-generated}"/>
                 <div class="form-group">
-                    <label for="email">@html.sign-up.label.email-work@</label>
-                    <input th:field="*{email}" id="email" type="text" class="form-control" required />
+                    <label for="email" th:text="#{html.sign-up.label.email-work}"></label>
+                    <input id="email" type="email" class="validation" name="email"
+                           th:field="*{email}"
+                           required />
                 </div>
-    <!--            <div class="form-group">-->
-    <!--                <label for="password">@html.label.password@</label>-->
-    <!--                <input th:field="*{password}" id="password" type="password" class="form-control" required />-->
-    <!--            </div>-->
+                <th:block th:if="${customPassword}">
+                    <div class="form-group">
+                        <label for="password" th:text="#{html.label.password}"/>
+                        <input id="password"
+                               type="password"
+                               class="validation"
+                               name="password"
+                               th:pattern="#{html.label.password-pattern}"
+                               th:title="#{html.label.password-title}"
+                               required />
+                    </div>
+                    <div class="form-group">
+                        <label for="password-repeat" th:text="#{html.label.password-repeat}"/>
+                        <input id="password-repeat"
+                               type="password"
+                               class="validation"
+                               name="password_repeat"
+                               th:equal-to-id="password"
+                               th:pattern="#{html.label.password-pattern}"
+                               th:title="#{html.label.password-title}"
+                               required />
+                    </div>
+                </th:block>
                 <div class="form-group">
-                    <label for="group">@html.sign-up.label.group@</label>
-                    <select th:name="groupUuid" id="group" class="form-control" required>
-                        <option th:each="group : ${groupList}" th:value="${group.uuid}" th:text="${group.description}"></option>
-                    </select>
+                    <label for="info" th:text="#{html.sign-up.label.info}"></label>
+                    <input id="info" type="text" class="validation" name="info"
+                           th:field="*{info}"
+                           required />
                 </div>
-                <div class="form-group">
-                    <label for="info">@html.sign-up.label.info@</label>
-                    <textarea th:name="info" th:field="*{info}" id="info" rows="1" cols="60" required ></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="wishes">@html.label.wishes@</label>
-                    <textarea th:name="wishes" th:field="*{wishes}" id="wishes" rows="4" cols="60" ></textarea>
-                </div>
-                <label for="notify">@html.label.receive-notifications@</label>
-                <input th:name="receiveNotifications" th:field="*{receiveNotifications}" id="notify" type="checkbox" class="form-control" checked required />
-                <div class="form-group">
-                    <button type="submit" class="btn btn-primary">@html.sign-up.button.register@</button>
-                </div>
+                <label for="notify" th:text="#{html.label.receive-notifications}"></label>
+                <input id="notify" type="checkbox" name="receiveNotifications" th:field="*{receiveNotifications}" checked />
+                <button type="submit" class="btn btn-primary" th:text="#{html.sign-up.button.register}" />
             </form>
         </div>
     </div>

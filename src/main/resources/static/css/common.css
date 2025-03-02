@@ -1,5 +1,5 @@
 .error-message {
-    color: red;
+    color: #bb1515;
     text-align: center;
     font-size: 150%;;
 }
@@ -7,6 +7,27 @@
 .main-table {
     display: flex;
     flex-direction: row;
+}
+
+.table-group {
+    width: 100%;
+}
+
+td {
+    text-align: center;
+    vertical-align: middle;
+}
+
+input.validation:valid {
+    background-color: ivory;
+    border: none;
+    outline: 2px solid deepskyblue;
+    border-radius: 5px;
+    accent-color: gold;
+}
+
+input.validation:invalid {
+    border: 2px solid red;
 }
 
 .left-box {
@@ -18,11 +39,11 @@
 }
 
 .container-box {
-    background-color: rgba(24, 193, 255, 0.64);
+    background-color: #97bdf1;
 }
 
 .container-sub-box {
-    background-color: rgba(42, 180, 255, 0.63);
+    background-color: #b4d3ff;
     color: #111;
     font-family: 'Helvetica Neue', sans-serif;
     font-size: 25px;
@@ -64,8 +85,8 @@
 
 /* Background color to the top navigation */
 .navbar {
-    background-color: #c5804a;
-    overflow: hidden;
+    padding: 3px;
+    background-color: #4b86a1;
 }
 
 .navbar-form {
@@ -75,7 +96,7 @@
 /* Links styles inside the navigation bar */
 .navbar a {
     float: left;
-    color: #e28f53;
+    color: #70afd5;
     text-align: center;
     padding: 14px 16px;
     text-decoration: none;
@@ -84,7 +105,7 @@
 
 /* Color of links on hover */
 .navbar a:hover {
-    background-color: #c5804a;
+    background-color: #639fc2;
     color: black;
 }
 
@@ -95,26 +116,27 @@
     cursor: pointer;
     outline: none;
     color: #fff;
-    background-color: #de6a1f;
+    background-color: #70afd5;
     border: none;
     border-radius: 15px;
-    box-shadow: 0 3px #9f683c;
+    box-shadow: 0 3px #559ab7;
+    overflow: hidden;
 }
 
 .navbar-btn-link:hover {
-    background-color: #c5804a;
+    background-color: #639fc2;
     color: black;
 }
 
 .navbar-btn-link:active {
-    background-color: #e38434;
-    box-shadow: 0 5px #9f683c;
+    background-color: #639fc2;
+    box-shadow: 0 5px #559ab7;
     transform: translateY(4px);
 }
 
 /* Color to the active/current link */
 .navbar a.active {
-    background-color: #de6a1f;
+    background-color: #58a2cb;
     color: white;
 }
 
@@ -123,6 +145,55 @@
     float: right;
 }
 
+/* Lang section inside the top navigation */
+.navbar-lang {
+    float: right;
+    padding: 5px 50px;
+    display: inline-block;
+}
+
 textarea {
     resize: none;
+}
+
+#lang-dropdown {
+    /*style the "box" in its minimzed state*/
+    /*border:0px solid black;*/
+    width:46px; height:46px; overflow:hidden;
+    /*animate the dropdown collapsing*/
+    transition: height 0.1s;
+    position: absolute;
+}
+#lang-dropdown:hover {
+    /*when expanded, the dropdown will get native means of scrolling*/
+    width:64px; height:96px; overflow-y:scroll;
+    /*animate the dropdown expanding*/
+    transition: height 0.5s;
+}
+#lang-dropdown input {
+    /*hide the nasty default radio buttons!*/
+    position:absolute;opacity:0;
+}
+#lang-dropdown label {
+    /*style the labels to look like dropdown options*/
+    display:none; margin:2px;
+    height:46px;
+    opacity:0.2;
+    background-repeat: no-repeat;
+    background-color: #4b86a1;
+    background-size: 32px;
+    background-position: center;
+}
+
+#lang-dropdown:hover label{
+    /*this is how labels render in the "expanded" state.
+     we want to see only the selected radio button in the collapsed menu,
+     and all of them when expanded*/
+    display:block;
+}
+#lang-dropdown input:checked + label {
+    /*tricky! labels immediately following a checked radio button
+      (with our markup they are semantically related) should be fully opaque
+      and visible even in the collapsed menu*/
+    opacity:1 !important; display:block;
 }

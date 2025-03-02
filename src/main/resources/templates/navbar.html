@@ -1,35 +1,49 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6"
-      lang="ru">
-<head>
-    <meta charset="UTF-8"/>
-    <title>@html.head.title.menu@</title>
-    <link rel="stylesheet" type="text/css" media="all" href="/css/common.css" />
-    <script src="/js/common.js"></script>
-</head>
+      th:lang="#{html.lang}">
 <body>
-<div th:fragment="menu" class="navbar font-size-130">
-    <form th:action="@{home}" class="navbar-form" method="get">
-        <button type="submit" class="navbar-btn-link">@html.button.info@</button>
-    </form>
-    <div class="navbar-right">
-        <form sec:authorize="hasAnyAuthority('SUPERADMIN','ADMIN')" th:action="@{groups}" class="navbar-form" method="get">
-            <button type="submit" class="navbar-btn-link">@html.button.groups@</button>
+<th:block th:fragment="menu">
+    <div class="navbar font-size-130">
+        <form th:action="@{home}" class="navbar-form" method="get">
+            <button type="submit" class="navbar-btn-link" th:text="#{html.button.info}"></button>
         </form>
-        <form sec:authorize="hasAnyAuthority('SUPERADMIN')" th:action="@{group}" class="navbar-form" method="get">
-            <button type="submit" class="navbar-btn-link">@html.button.group@</button>
-        </form>
-        <form sec:authorize="isAuthenticated()" th:action="@{participant}" class="navbar-form" method="get">
-            <button type="submit" class="navbar-btn-link">@html.button.profile@</button>
-        </form>
-        <form sec:authorize="!isAuthenticated()" th:action="@{sign_in}" class="navbar-form" method="get">
-            <button type="submit" class="navbar-btn-link">@html.button.login@</button>
-        </form>
-        <form sec:authorize="isAuthenticated()" th:action="@{logout}" class="navbar-form" method="post">
-            <button type="submit" class="navbar-btn-link" onclick="return clickConfirm()">@html.button.logout@</button>
-        </form>
+        <div class="navbar-right">
+            <form sec:authorize="isAuthenticated()" th:action="@{groups}" class="navbar-form" method="get">
+                <button type="submit" class="navbar-btn-link" th:text="#{html.button.groups}"></button>
+            </form>
+            <form sec:authorize="isAuthenticated()" th:action="@{participant}" class="navbar-form" method="get">
+                <button type="submit" class="navbar-btn-link" th:text="#{html.button.profile}"></button>
+            </form>
+            <form sec:authorize="!isAuthenticated()" th:action="@{sign_in}" class="navbar-form" method="get">
+                <button type="submit" class="navbar-btn-link" th:text="#{html.button.login}"></button>
+            </form>
+            <form sec:authorize="isAuthenticated()" th:action="@{logout}" class="navbar-form" method="post">
+                <button type="submit"
+                        class="navbar-btn-link"
+                        th:confirm-message="#{html.button.logout-confirm}"
+                        onclick="return clickConfirm(this.getAttribute('confirm-message'))"
+                        th:text="#{html.button.logout}">
+                </button>
+            </form>
+            <div class="navbar-lang" th:if="${availableMessageBundles.size() > 1}">
+                <div id="lang-dropdown">
+                    <th:block th:each="bundle : ${availableMessageBundles}">
+                        <input th:id="'lang-dropdown.' + ${bundle.getLang()}"
+                               th:value="${bundle.getLang()}"
+                               type="radio"
+                               name="lang-radio"
+                        />
+                        <label th:title="${bundle.getLang()}"
+                               th:for="'lang-dropdown.' + ${bundle.getLang()}"
+                               th:style="'background-image: url(&quot;' + ${bundle.getImageUrl()} + '&quot;)'"
+                        ></label>
+                    </th:block>
+                </div>
+            </div>
+        </div>
     </div>
-</div>
+    <span class="error-message" th:if="${errMessage != null && !errMessage.isBlank()}" th:text="${errMessage}"></span>
+</th:block>
 </body>
 </html>

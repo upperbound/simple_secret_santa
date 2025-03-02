@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.github.upperbound</groupId>
     <artifactId>simple_secret_santa</artifactId>
-    <version>1.0</version>
+    <version>2.0</version>
 
     <name>Simple Secret Santa</name>
     <description>Simple implementation of an office-driven Secret Santa</description>
@@ -26,25 +26,91 @@
         <java.version>21</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <thymeleaf-extras.version>3.1.2.RELEASE</thymeleaf-extras.version>
+        <springdoc-openapi.version>2.8.4</springdoc-openapi.version>
+        <bouncycastle.version>1.78.1</bouncycastle.version>
+        <mapstruct.version>1.5.5.Final</mapstruct.version>
         <slf4j.version>2.0.13</slf4j.version>
+
+        <swagger-core-version>2.0.0</swagger-core-version>
+        <okhttp-version>2.7.5</okhttp-version>
+        <gson-version>2.8.1</gson-version>
+        <gson-fire-version>1.8.3</gson-fire-version>
+        <threetenbp-version>1.3.5</threetenbp-version>
+        <maven-plugin-version>1.0.0</maven-plugin-version>
+        <junit-version>4.13.1</junit-version>
     </properties>
 
+    <repositories>
+        <repository>
+            <id>maven</id>
+            <name>maven central</name>
+            <url>https://repo1.maven.org/maven2/</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>spring-milestones</id>
+            <name>Spring Milestones</name>
+            <url>https://repo.spring.io/milestone</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+    <pluginRepositories>
+        <pluginRepository>
+            <id>spring-milestones</id>
+            <name>Spring Milestones</name>
+            <url>https://repo.spring.io/milestone</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </pluginRepository>
+    </pluginRepositories>
+
     <build>
-        <filters>
-            <filter>src/main/resources/templates.properties</filter>
-        </filters>
+        <finalName>${artifactId}</finalName>
         <resources>
             <resource>
+                <filtering>false</filtering>
                 <directory>src/main/resources</directory>
                 <excludes>
-                    <exclude>templates/**</exclude>
-                    <exclude>templates.properties</exclude>
+                    <exclude>config.properties</exclude>
+                    <exclude>log4j2.xml</exclude>
                 </excludes>
             </resource>
             <resource>
-                <directory>src/main/resources/templates</directory>
-                <targetPath>templates</targetPath>
                 <filtering>true</filtering>
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>log4j2.xml</include>
+                </includes>
+            </resource>
+            <resource>
+                <filtering>true</filtering>
+                <directory>image</directory>
+                <targetPath>../</targetPath>
+                <includes>
+                    <include>run.sh</include>
+                </includes>
+            </resource>
+            <resource>
+                <filtering>false</filtering>
+                <directory>src/main/resources</directory>
+                <targetPath>../config/</targetPath>
+                <includes>
+                    <include>config.properties</include>
+                    <include>keystore-secret.jks</include>
+                    <include>private-ec-key.pem</include>
+                    <include>certificate-ec.crt</include>
+                    <include>messages*.properties</include>
+                </includes>
+            </resource>
+            <resource>
+                <filtering>false</filtering>
+                <directory>src/main/resources/static</directory>
+                <targetPath>../config/resources</targetPath>
             </resource>
         </resources>
         <plugins>
@@ -74,39 +140,97 @@
                 </dependencies>
             </plugin>
             <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <excludes>
-                        <exclude>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.mapstruct</groupId>
+                            <artifactId>mapstruct-processor</artifactId>
+                            <version>1.5.5.Final</version>
+                        </path>
+                        <path>
                             <groupId>org.projectlombok</groupId>
                             <artifactId>lombok</artifactId>
-                        </exclude>
+                            <version>${lombok.version}</version>
+                        </path>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok-mapstruct-binding</artifactId>
+                            <version>0.2.0</version>
+                        </path>
+                    </annotationProcessorPaths>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>static/**</exclude>
+                        <exclude>keystore-secret.jks</exclude>
+                        <exclude>private-ec-key.pem</exclude>
+                        <exclude>certificate-ec.crt</exclude>
+                        <exclude>messages*.properties</exclude>
                     </excludes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-dependencies</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/dependencies</outputDirectory>
+                            <excludeTransitive>false</excludeTransitive>
+                            <overWriteReleases>false</overWriteReleases>
+                            <overWriteSnapshots>true</overWriteSnapshots>
+                            <overWriteIfNewer>true</overWriteIfNewer>
+                            <includeScope>runtime</includeScope>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <target>
+                        <delete dir="${project.build.directory}/release/"/>
+                        <mkdir dir="${project.build.directory}/release/"/>
+                        <copy todir="${project.build.directory}/release/config/">
+                            <fileset dir="${project.build.directory}/config/"
+                                     includes="**/*.*"/>
+                        </copy>
+                        <copy todir="${project.build.directory}/release/dependencies/">
+                            <fileset dir="${project.build.directory}/dependencies/"
+                                     includes="**/*.*"/>
+                        </copy>
+                        <copy todir="${project.build.directory}/release/">
+                            <fileset dir="${project.build.directory}/"
+                                     includes="${build.finalName}.jar,run.sh"/>
+                        </copy>
+                        <zip basedir="${project.build.directory}/release"
+                             zipfile="${project.build.directory}/${build.finalName}.zip"
+                             encoding="UTF-8"/>
+                    </target>
                 </configuration>
             </plugin>
         </plugins>
     </build>
-    <repositories>
-        <repository>
-            <id>spring-milestones</id>
-            <name>Spring Milestones</name>
-            <url>https://repo.spring.io/milestone</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
-    <pluginRepositories>
-        <pluginRepository>
-            <id>spring-milestones</id>
-            <name>Spring Milestones</name>
-            <url>https://repo.spring.io/milestone</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </pluginRepository>
-    </pluginRepositories>
 
     <dependencies>
         <dependency>
@@ -169,8 +293,27 @@
             </exclusions>
         </dependency>
         <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-tomcat</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <version>${springdoc-openapi.version}</version>
+        </dependency>
+        <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk18on</artifactId>
+            <version>${bouncycastle.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcpkix-jdk18on</artifactId>
+            <version>${bouncycastle.version}</version>
         </dependency>
 
         <!-- logging -->
@@ -192,18 +335,19 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-devtools</artifactId>
-            <scope>runtime</scope>
+            <scope>provided</scope>
             <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
             <scope>provided</scope>
-            <optional>true</optional>
         </dependency>
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-tomcat</artifactId>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct</artifactId>
+            <version>${mapstruct.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

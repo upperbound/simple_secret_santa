@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration name="config" status="warn">
+    <Appenders>
+        <Console name="stdout">
+            <ThresholdFilter level="INFO"/>
+<!--            <PatternLayout pattern="%date [%thread] %-5level %logger - %notEmpty{[%MDC{session_user}:%MDC{service_action}]} %msg%n"/>-->
+            <PatternLayout pattern="%date [%thread] %-5level %logger -%equals{ user[%MDC{session_user}]}{ user[]}{}%equals{ action[%MDC{service_action}]}{ action[]}{} %msg%n"/>
+        </Console>
+    </Appenders>
+
+    <Loggers>
+        <Logger name="org.springframework" level="info"/>
+        <Logger name="org.hibernate" level="info"/>
+
+        <Root level="debug">
+            <AppenderRef ref="stdout"/>
+        </Root>
+    </Loggers>
+</Configuration>

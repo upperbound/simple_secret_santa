@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6"
+      lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>@html.head.title.main@</title>
+    <link rel="stylesheet" type="text/css" media="all" href="@html.head.css.common@" />
+    <script src="@html.head.js.common@"></script>
+</head>
+<body>
+<div th:insert="~{navbar :: menu}"></div>
+<div th:if="${param.error}">
+    @html.error.wrong-data@
+</div>
+<div th:if="${param.logout}">
+    @html.error.session-closed@
+</div>
+<span class="error-message" th:if="${errMessage != null && !errMessage.isBlank()}" th:text="${errMessage}">errMessage</span>
+<main class="main-table">
+    <div class="left-box"></div>
+    <div class="container container-box">
+        <div class="container-sub-box">
+            <h2>@html.sign-in.h2.enter@</h2>
+        </div>
+        <div class="font-size-130">
+            <div class="form-box">
+                <form th:action="@{do_login}" th:object="${participant}" method="post">
+                    <div th:if="${regConfirmMessage != null && !regConfirmMessage.isBlank()}" class="form-group">
+                        <label style="font-size: 150%" th:text="${regConfirmMessage}">regConfirmMessage</label>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">@html.sign-up.label.email-work@</label>
+                        <input th:field="*{email}" id="email" type="text" class="form-control" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="password">@html.label.password@</label>
+                        <input th:field="*{password}" id="password" type="password" class="form-control" required />
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary">@html.button.login@</button>
+                        <a th:href="@{forgot_password}" class="btn btn-link">
+                            @html.sign-in.link.forgot-password@
+                        </a>
+                    </div>
+                    <a th:if="${availableGroups != null && !availableGroups.isEmpty()}" th:href="@{sign_up}" class="btn btn-link">
+                        @html.sign-in.link.register@
+                    </a>
+                </form>
+            </div>
+        </div>
+    </div>
+</main>
+</body>
+</html>

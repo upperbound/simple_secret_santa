@@ -1,0 +1,128 @@
+.error-message {
+    color: red;
+    text-align: center;
+    font-size: 150%;;
+}
+
+.main-table {
+    display: flex;
+    flex-direction: row;
+}
+
+.left-box {
+    width: 20%;
+}
+
+.container {
+    width: 70%;
+}
+
+.container-box {
+    background-color: rgba(24, 193, 255, 0.64);
+}
+
+.container-sub-box {
+    background-color: rgba(42, 180, 255, 0.63);
+    color: #111;
+    font-family: 'Helvetica Neue', sans-serif;
+    font-size: 25px;
+    font-weight: bold;
+    letter-spacing: -1px;
+    line-height: 1;
+    text-align: center;
+}
+
+.info {
+    display: grid;
+    text-align: center;
+}
+
+.font-size-130 {
+    font-size: 130%;
+}
+
+.form-box {
+    display: grid;
+    gap: 20px;
+    grid-template-columns: 1fr 1fr;
+}
+
+.form-box label {
+    text-align:center;
+}
+
+.form-box label:after {
+    content: ":";
+}
+
+.form-group {
+    margin-bottom: 10px;
+    margin-top: 10px;
+    display: grid;
+    gap: 0;
+}
+
+/* Background color to the top navigation */
+.navbar {
+    background-color: #c5804a;
+    overflow: hidden;
+}
+
+.navbar-form {
+    display: inline-block;
+}
+
+/* Links styles inside the navigation bar */
+.navbar a {
+    float: left;
+    color: #e28f53;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+    font-size: 17px;
+}
+
+/* Color of links on hover */
+.navbar a:hover {
+    background-color: #c5804a;
+    color: black;
+}
+
+.navbar-btn-link {
+    padding: 15px 25px;
+    font-size: 24px;
+    text-align: center;
+    cursor: pointer;
+    outline: none;
+    color: #fff;
+    background-color: #de6a1f;
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 3px #9f683c;
+}
+
+.navbar-btn-link:hover {
+    background-color: #c5804a;
+    color: black;
+}
+
+.navbar-btn-link:active {
+    background-color: #e38434;
+    box-shadow: 0 5px #9f683c;
+    transform: translateY(4px);
+}
+
+/* Color to the active/current link */
+.navbar a.active {
+    background-color: #de6a1f;
+    color: white;
+}
+
+/* Right-aligned section inside the top navigation */
+.navbar-right {
+    float: right;
+}
+
+textarea {
+    resize: none;
+}

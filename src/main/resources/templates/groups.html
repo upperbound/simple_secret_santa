@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6"
+      lang="ru">
+<head>
+    <meta http-equiv="Content-Type" content="text/html" charset="UTF-8">
+    <title>@html.head.title.main@</title>
+    <link rel="stylesheet" type="text/css" media="all" href="@html.head.css.common@" />
+    <script src="@html.head.js.common@"></script>
+</head>
+<body>
+<div th:insert="~{navbar :: menu}"></div>
+<span class="error-message" th:if="${errMessage != null && !errMessage.isBlank()}" th:text="${errMessage}">errMessage</span>
+<main class="main-table">
+    <div class="left-box"></div>
+    <div class="container container-box">
+        <div class="font-size-130">
+            <form sec:authorize="hasAuthority('SUPERADMIN')" th:action="@{groups}" method="get">
+                <label for="group_list">@html.label.group@</label>
+                <select th:name="groupUuid" onchange="this.form.submit()" id="group_list" class="form-control" required>
+                    <option th:each="g : ${groupList}"
+                            th:value="${g.uuid}"
+                            th:text="${g.description}"
+                            th:selected="${g.equals(group)}"></option>
+                </select>
+            </form>
+            <div sec:authorize="!hasAuthority('SUPERADMIN')" th:object="${group}" class="form-group">
+                <input th:name="groupUuid" th:value="*{uuid}" type="hidden" id="group_uuid" />
+                <label for="group">@html.label.group@</label>
+                <input th:name="groupDescription" th:field="*{description}" id="group" type="text" readonly />
+            </div>
+        </div>
+        <div th:if="${group.hasDrawn}" class="container-sub-box">
+            <h2>@html.groups.h2.has-draw@</h2>
+        </div>
+        <div class="font-size-130">
+            <table class="table-group">
+                <caption>
+                    @html.groups.table1.caption@
+                </caption>
+                <col>
+                <col>
+                <colgroup span="5"></colgroup>
+                <thead>
+                <tr>
+                    <th scope="col">@html.groups.table1.col1@</th>
+                    <th scope="col">@html.groups.table1.col2@</th>
+                    <th scope="col">@html.groups.table1.col3@</th>
+                    <th sec:authorize="hasAuthority('SUPERADMIN')" scope="col">@html.groups.table1.col4@</th>
+                    <th colspan="3" scope="colgroup">@html.groups.table1.col5@</th>
+                </tr>
+                </thead>
+                <tr th:each="p : ${participantList}">
+                    <td th:text="${p.email}"></td>
+                    <td th:text="${p.info}"></td>
+                    <td th:text="${p.role.getAuthority()}"></td>
+                    <form sec:authorize="hasAuthority('SUPERADMIN')"
+                          th:action="@{groups}"
+                          th:value="${p.uuid}"
+                          th:placeholder="participantUuid"
+                          method="post">
+                        <td>
+                            <select th:name="targetGroupUuid" id="groups" class="form-control" required>
+                                <option th:each="g : ${groupList}"
+                                        th:value="${g.uuid}"
+                                        th:text="${g.description}"
+                                        th:selected="${g.equals(p.group)}"></option>
+                            </select>
+                        </td>
+                        <td>
+                            <input th:name="groupUuid" th:value="${group.uuid}" type="hidden" id="group_uuid_for_move" />
+                            <input th:name="participantUuid" th:value="${p.uuid}" type="hidden" id="participant_uuid_move" />
+                            <button th:name="action" th:value="move_participant"
+                                    onclick="return clickConfirm('@html.groups.button.move-participant.confirm@')"
+                                    type="submit" class="btn btn-primary">@html.groups.button.move-participant@</button>
+                        </td>
+                    </form>
+                    <td>
+                        <form th:action="@{groups}" method="post">
+                            <input th:name="groupUuid" th:value="${group.uuid}" type="hidden" id="group_uuid_for_delete" />
+                            <input th:name="participantUuid" th:value="${p.uuid}" type="hidden" id="participant_uuid_delete" />
+                            <button th:name="action" th:value="delete_participant"
+                                    onclick="return clickConfirm('@html.groups.button.delete-participant.confirm@')"
+                                    type="submit" class="btn btn-primary">@html.groups.button.delete-participant@</button>
+                        </form>
+                    </td>
+                    <td>
+                        <form sec:authorize="hasAuthority('SUPERADMIN')"
+                              th:if="${!'SUPERADMIN'.equals(p.role.getAuthority())}"
+                              th:action="@{groups}"
+                              method="post">
+                            <input th:name="groupUuid" th:value="${group.uuid}" type="hidden" id="group_uuid_for_swap" />
+                            <input th:name="participantUuid" th:value="${p.uuid}" type="hidden" id="participant_uuid_swap" />
+                            <button th:name="action" th:value="swap_role"
+                                    onclick="return clickConfirm('@html.groups.button.swap-role.confirm@')"
+                                    type="submit" class="btn btn-primary">@html.groups.button.swap-role@</button>
+                        </form>
+                    </td>
+                </tr>
+            </table>
+            <label for="participant_count">@html.groups.label.participant-count@</label>
+            <input th:value="${participantsCount}" id="participant_count" type="text" readonly />
+            <form th:if="${!group.hasDrawn}" th:action="@{groups}" method="post">
+                <input th:name="groupUuid" th:value="${group.uuid}" type="hidden" id="group_uuid_for_draw" />
+                <button th:name="action" th:value="do_draw"
+                        onclick="return clickConfirm('@html.groups.button.make-a-draw.confirm@')"
+                        type="submit" class="btn btn-primary">@html.groups.button.make-a-draw@</button>
+            </form>
+            <form th:if="${group.hasDrawn}" th:action="@{groups}" method="post">
+                <input th:name="groupUuid" th:value="${group.uuid}" type="hidden" id="group_uuid_for_undraw" />
+                <button th:name="action" th:value="cancel_draw"
+                        onclick="return clickConfirm('@html.groups.button.cancel-draw.confirm@')"
+                        type="submit" class="btn btn-primary">@html.groups.button.cancel-draw@</button>
+            </form>
+        </div>
+    </div>
+</main>
+</body>
+</html>

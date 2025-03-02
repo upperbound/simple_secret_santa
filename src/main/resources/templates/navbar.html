@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6"
+      lang="ru">
+<head>
+    <meta charset="UTF-8"/>
+    <title>@html.head.title.menu@</title>
+    <link rel="stylesheet" type="text/css" media="all" href="/css/common.css" />
+    <script src="/js/common.js"></script>
+</head>
+<body>
+<div th:fragment="menu" class="navbar font-size-130">
+    <form th:action="@{home}" class="navbar-form" method="get">
+        <button type="submit" class="navbar-btn-link">@html.button.info@</button>
+    </form>
+    <div class="navbar-right">
+        <form sec:authorize="hasAnyAuthority('SUPERADMIN','ADMIN')" th:action="@{groups}" class="navbar-form" method="get">
+            <button type="submit" class="navbar-btn-link">@html.button.groups@</button>
+        </form>
+        <form sec:authorize="hasAnyAuthority('SUPERADMIN')" th:action="@{group}" class="navbar-form" method="get">
+            <button type="submit" class="navbar-btn-link">@html.button.group@</button>
+        </form>
+        <form sec:authorize="isAuthenticated()" th:action="@{participant}" class="navbar-form" method="get">
+            <button type="submit" class="navbar-btn-link">@html.button.profile@</button>
+        </form>
+        <form sec:authorize="!isAuthenticated()" th:action="@{sign_in}" class="navbar-form" method="get">
+            <button type="submit" class="navbar-btn-link">@html.button.login@</button>
+        </form>
+        <form sec:authorize="isAuthenticated()" th:action="@{logout}" class="navbar-form" method="post">
+            <button type="submit" class="navbar-btn-link" onclick="return clickConfirm()">@html.button.logout@</button>
+        </form>
+    </div>
+</div>
+</body>
+</html>

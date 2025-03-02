@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6"
+      lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>@html.head.title.main@</title>
+    <link rel="stylesheet" type="text/css" media="all" href="@html.head.css.common@" />
+    <script src="@html.head.js.common@"></script>
+</head>
+<body>
+<div th:insert="~{navbar :: menu}"></div>
+<span class="error-message" th:if="${errMessage != null && !errMessage.isBlank()}" th:text="${errMessage}">errMessage</span>
+<main class="main-table">
+    <div class="left-box"></div>
+    <div class="container container-box">
+        <div class="container-sub-box">
+            <h2>@html.sign-up.h2.registration@</h2>
+        </div>
+        <div class="font-size-130">
+            <form th:action="@{sign_up}" th:object="${participant}" method="post">
+                <label>@html.sign-up.label.password-will-be-generated@</label>
+                <div class="form-group">
+                    <label for="email">@html.sign-up.label.email-work@</label>
+                    <input th:field="*{email}" id="email" type="text" class="form-control" required />
+                </div>
+    <!--            <div class="form-group">-->
+    <!--                <label for="password">@html.label.password@</label>-->
+    <!--                <input th:field="*{password}" id="password" type="password" class="form-control" required />-->
+    <!--            </div>-->
+                <div class="form-group">
+                    <label for="group">@html.sign-up.label.group@</label>
+                    <select th:name="groupUuid" id="group" class="form-control" required>
+                        <option th:each="group : ${groupList}" th:value="${group.uuid}" th:text="${group.description}"></option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="info">@html.sign-up.label.info@</label>
+                    <textarea th:name="info" th:field="*{info}" id="info" rows="1" cols="60" required ></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="wishes">@html.label.wishes@</label>
+                    <textarea th:name="wishes" th:field="*{wishes}" id="wishes" rows="4" cols="60" ></textarea>
+                </div>
+                <label for="notify">@html.label.receive-notifications@</label>
+                <input th:name="receiveNotifications" th:field="*{receiveNotifications}" id="notify" type="checkbox" class="form-control" checked required />
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">@html.sign-up.button.register@</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</main>
+</body>
+</html>

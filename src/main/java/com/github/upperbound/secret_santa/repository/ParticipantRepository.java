@@ -27,12 +27,4 @@ public interface ParticipantRepository extends JpaRepository<Participant, String
                     "join ParticipantGroupLink gl on gl.participant = p "
     )
     Long participantsWithinGroups();
-
-//    @Query(
-//            "select p " +
-//                    "from Participant p " +
-//                    "join ParticipantGroupLink gl on gl.participant = p " +
-//                    "where gl.giftee = :giftee"
-//    )
-//    List<Participant> findAllByGiftee(@Param("giftee") Participant giftee);
 }

@@ -9,7 +9,7 @@ import java.lang.annotation.*;
 import static java.lang.annotation.ElementType.*;
 
 /**
- * <p> Provides he same logic as an {@link jakarta.validation.constraints.Email Email} and supports
+ * <p> Provides the same logic as an {@link jakarta.validation.constraints.Email Email} and supports
  * expression-driven property injection for {@link Email#regexp() regexp} and {@link Email#message() message} </p>
  * @author Vladislav Tsukanov
  * @see org.springframework.beans.factory.annotation.Value Value

@@ -75,33 +75,6 @@ public class ParticipantServiceImpl implements ParticipantService {
         return result;
     }
 
-//    @MDCLog(mdcKey = ApplicationParams.MDC_SERVICE_ACTION, exceptionMessage = EXCEPTION_MESSAGE_TEMPLATE)
-//    @Override
-//    public List<Participant> findAllByGroup(Group group) {
-//        return participantRepository.findAllByGroup(group);
-//    }
-
-//    @MDCLog(mdcKey = ApplicationParams.MDC_SERVICE_ACTION, exceptionMessage = EXCEPTION_MESSAGE_TEMPLATE)
-//    @Override
-//    public boolean updateRole(String email, ParticipantRole role) {
-//        Participant participant = participantRepository.findByEmail(email).orElse(null);
-//        if (participant == null)
-//            return false;
-//        participant.setRole(role);
-//        participantRepository.save(participant);
-//    }
-
-//    @MDCLog(mdcKey = ApplicationParams.MDC_SERVICE_ACTION, exceptionMessage = EXCEPTION_MESSAGE_TEMPLATE)
-//    @Override
-//    public boolean swapRole(String uuid) {
-//        Participant participant = participantRepository.findById(uuid).orElse(null);
-//        if (participant == null)
-//            return false;
-//        participant.setRole(participant.getRole().equals(ParticipantRole.USER) ? ParticipantRole.ADMIN : ParticipantRole.USER);
-//        participantRepository.save(participant);
-//        return true;
-//    }
-
     @MDCLog(mdcKey = StaticContext.MDC_SERVICE_ACTION, exceptionMessage = EXCEPTION_MESSAGE_TEMPLATE)
     @Transactional
     @Override
@@ -271,64 +244,6 @@ public class ParticipantServiceImpl implements ParticipantService {
         return false;
     }
 
-    //    @MDCLog(mdcKey = ApplicationParams.MDC_SERVICE_ACTION, exceptionMessage = EXCEPTION_MESSAGE_TEMPLATE)
-//    @Override
-//    public boolean move(String participantUuid, Group targetGroup) throws ServiceException {
-//        Participant participant = findById(participantUuid);
-//        if (participant == null)
-//            return false;
-//        Group currentGroup = participant.getGroup();
-//        if (targetGroup == null)
-//            return false;
-//        if (currentGroup.equals(targetGroup))
-//            return false;
-//        if (currentGroup.getHasDrawn() && !delete(participant.getUuid(), false))
-//            return false;
-//        log.info(
-//                "moving participant '{}' from group '{}' to group '{}'",
-//                participant.getEmail(),
-//                currentGroup.getDescription(),
-//                targetGroup.getDescription()
-//        );
-//        participant.setGiftee(null);
-//        Participant forReplace = null;
-//        if (targetGroup.getHasDrawn()) {
-//            List<Participant> targetGroupParticipants = findAllByGroup(targetGroup);
-//            targetGroupParticipants.remove(getCurrentAuthentication());
-//            if (!targetGroupParticipants.isEmpty()) {
-//                Random random = new Random();
-//                forReplace = targetGroupParticipants.get(random.nextInt(0, targetGroupParticipants.size()));
-//                participant.setGiftee(forReplace.getGiftee());
-//                forReplace.setGiftee(participant);
-//                participantRepository.save(forReplace);
-//            }
-//        }
-//        participant.setGroup(targetGroup);
-//        participantRepository.save(participant);
-//        participantRepository.flush();
-//        if (forReplace != null) {
-//            mailService.sendMessage(
-//                    participant.getEmail(),
-//                    applicationParams.getMailCommonSubject(participant.getGroup().getDescription()),
-//                    applicationParams.getMailDrawChangesText(
-//                            participant.getGiftee().getEmail(),
-//                            participant.getGiftee().getInfo(),
-//                            participant.getGiftee().getWishes()
-//                    )
-//            );
-//            mailService.sendMessage(
-//                    forReplace.getEmail(),
-//                    applicationParams.getMailCommonSubject(forReplace.getGroup().getDescription()),
-//                    applicationParams.getMailDrawChangesText(
-//                            forReplace.getGiftee().getEmail(),
-//                            forReplace.getGiftee().getInfo(),
-//                            forReplace.getGiftee().getWishes()
-//                    )
-//            );
-//        }
-//        return true;
-//    }
-
     @MDCLog(mdcKey = StaticContext.MDC_SERVICE_ACTION, exceptionMessage = EXCEPTION_MESSAGE_TEMPLATE)
     @Transactional
     @Override
@@ -338,8 +253,6 @@ public class ParticipantServiceImpl implements ParticipantService {
             return Participant.ANONYMOUS;
         Object o = authentication.getPrincipal();
         if (o instanceof Participant participant) {
-//            Participant p = findById(participant.getUuid());
-//            return p == null ? Participant.ANONYMOUS : p;
             return participant;
         }
         return Participant.ANONYMOUS;

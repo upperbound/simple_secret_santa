@@ -3,11 +3,14 @@
 # Simple implementation of a self-hosting office-driven Secret Santa
 
 ### Description
+An application that allows you to participate in the intriguing game "Secret Santa". It provides the ability
+to create groups, invite participants to these groups and then draw the results to determine the "giftee" for each participant.
+
 Java version - 21\
 [Application properties](./src/main/resources/application.properties) - contains all common application properties\
 [Localization bundles](./src/main/resources/messages.properties) - used for localization of the application.\
-The html-page templates are located in **resources/templates** (Thymeleaf has been used for server-side html generation)\
-\
+The html-page templates are located in **resources/templates** (Thymeleaf has been used for server-side html generation)
+
 Since Spring Boot is used, during auto-configuration Spring already knows that:
 - the templates are located in **resources/templates** (and **view** is already available with these names in the controllers).
 - static resources are located in **resources/static** (which will be published to the specific address
@@ -16,7 +19,17 @@ according to the folder structure inside, e.g. **http://localhost:8080/css/commo
 
 ### Build
 The build prepares a `zip` archive that contains the [startup script](./image/run.sh), main `jar` + dependencies,
-as well as a directory with the necessary resources and a configuration file.
+as well as a directory with the necessary resources and a configuration file.\
+Environment variables to run this application:
+- `JAVA_HOME` - path to java, e.g. `/opt/jdk-21.0.6`
+- `HEAP_INIT` (optional) - available amount of physical memory at startup, `1G` by default
+- `HEAP_MAX` (optional) - maximum available amount of physical memory, `1G` by default
+- `JMX_REMOTE_PORT` (optional) - port for jmx, `disabled` by default
+
+To run a demo version with pre-initialized DB (`admin@example.org` as a superadmin user with password `0`) just run as:
+```bash
+export JAVA_HOME=/path/to/java && bash run.sh example
+```
 
 ### Application settings
 All the basic settings are located in the `config` folder - it contains all the `messages**.properties` files
@@ -35,6 +48,8 @@ sends it within a notification (if notification sending is not disabled)
 will be started.\
 Description of all necessary settings:
 ```properties
+# Comma separated profiles for application behavior. Described above. 
+spring.profiles.active=
 # Duration for participant's 'password reset' action
 app.action-token-duration=2H
 # keystore with a secret key to encrypt/decrypt any data within DB
@@ -58,22 +73,21 @@ app.mail.resend-attempts=1
 # regex-pattern for allowed participant's email format, default .*
 app.mail.allowed-regex=.*
 # validation error message for participant's email
-app.mail.allowed-err-message=email '%s' does not belong to any corporate domain=@my-office.com / @my-office.org
+app.mail.allowed-err-message=email '%s' does not belong to any corporate domain @my-office.com / @my-office.org
 # DNS or IP of this app (e.g. https://secret-santa.my-office.com) - will be used within notifications
 app.server.url=http://${server.address}:${server.port}
 # the only way to grant/revoke 'superadmin' role is through the following options during startup:
 # list of users which role will be set to 'superadmin'
-app.superadmins: "{'user1@my-office.com','user2@my-office.com'}"
+app.superadmins="{'user1@my-office.com','user2@my-office.com'}"
 # list of users which role will be set to 'user'
-app.users: "{'user3@my-office.com','user4@my-office.com'}"
-# example server settings
+app.users="{'user3@my-office.com','user4@my-office.com'}"
+# Settings for servlet container. SSL is disabled by default. If TLS connection is needed
+# then `enabled: true` must be enabled and certificate+private key should be added to 'config' dir
 server.address=localhost
 server.port=8080
 server.ssl.enabled=false
 server.ssl.certificate=classpath:certificate-ec.crt
 server.ssl.certificate-private-key=classpath:private-ec-key.pem
-# Comma separated profiles for application behavior. Described above. 
-spring.profiles.active=
 # The name of the database and the user under whom the new database and all the necessary tables will be created.
 spring.datasource.db-name=santa-db
 spring.datasource.username=admin

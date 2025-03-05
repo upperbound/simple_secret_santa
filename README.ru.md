@@ -3,11 +3,14 @@
 # Простая реализация офисной версии Тайного Деда-Мороза
 
 ### Описание
+Приложение, которое позволяет принять участие в игре "Тайный Дед-Мороз". Предоставляет возможности для создания групп,
+приглашения участников в эти группы и розыгрыша результатов для определения подопечных всем участникам.
+
 Версия Java - 21\
 [Параметры приложения](./src/main/resources/application.properties) - содержит все основные настройки приложения\
 [Сообщения для локализации](./src/main/resources/messages.properties) - используются для локализации приложения.\
-Шаблоны страниц лежат в папке **resources/templates** (используется Thymeleaf для server-side генерации html страниц)\
-\
+Шаблоны страниц лежат в папке **resources/templates** (используется Thymeleaf для server-side генерации html страниц)
+
 Так как используется Spring Boot, то при автоконфигурации Spring уже знает, что:
 - шаблоны находятся в **resources/templates** (и доступны **view** уже с этими именами в контроллерах).
 - статичные ресурсы находятся в **resources/static** (которые он публикует сразу по нужному адресу -
@@ -17,6 +20,16 @@
 ### Сборка
 Сборка подготавливает `zip` архив, который содержит [скрипт запуска](./image/run.sh), основной `jar` файл + зависимости,
 а также каталог с необходимым ресурсами и файлом конфигурации.
+Переменные окружения для запуска приложения:
+- `JAVA_HOME` - путь до java, например `/opt/jdk-21.0.6`
+- `HEAP_INIT` (не обязательно) - размер выделенной оперативной памяти при старте приложения, `1G` по умолчанию
+- `HEAP_MAX` (не обязательно) - максимальное количество выделенной оперативной памяти, `1G` по умолчанию
+- `JMX_REMOTE_PORT` (не обязательно) - порт для jmx, `отключено` по умолчанию
+
+Чтобы запустить демо версию с предзаполненной БД (superadmin пользователь `admin@example.org` с паролем `0`) нужно выполнить:
+```bash
+export JAVA_HOME=/path/to/java && bash run.sh example
+```
 
 ### Настройки приложения
 Все основные настройки содержатся в каталоге `config` - содержит все файлы `messages**.properties` для локализации, файл
@@ -34,6 +47,8 @@
 в рамках какого окружения будет запущенно данное приложение.\
 Описание основных и обязательных настроек:
 ```properties
+# Профили через запятую для управления поведением приложения. Описаны выше. 
+spring,profiles,active=
 # Время действия токена для сброса пароля
 app.action-token-duration=2H
 # keystore с секретным ключом для шифрования данных в БД
@@ -57,15 +72,14 @@ app.mail.resend-attempts=1
 # шаблон регулярного выражения для проверки валидности email, по умолчанию .*
 app.mail.allowed-regex=.*
 # сообщение об ошибке при нарушении 'allowed-regex'
-app.mail.allowed-err-message=email '%s' does not belong to any corporate domain=@my-office.com / @my-office.org
+app.mail.allowed-err-message=email '%s' does not belong to any corporate domain @my-office.com / @my-office.org
 # DNS или IP данного приложения (например https://secret-santa.my-office.com) - будет использован в различных уведомлениях
 app.server.url=http://${server.address}:${server.port}
 # единственный способ установить/убрать роль 'superadmin' только при старте приложения:
 # список пользователей которым установить роль 'superadmin'
-app.superadmins: "{'user1@my-office.com','user2@my-office.com'}"
+app.superadmins="{'user1@my-office.com','user2@my-office.com'}"
 # список пользователей которым установить роль 'user'
-app.users: "{'user3@my-office.com','user4@my-office.com'}"
-
+app.users="{'user3@my-office.com','user4@my-office.com'}"
 # Настройки для запуска контейнера сервлетов. SSL по умолчанию отключен, если необходимо использовать
 # TLS соединение на уровне приложения, а не в рамках внешнего сервера, тогда необходимо установить `enabled: true`
 # и добавить сертификат и private key
@@ -74,8 +88,6 @@ server.port=8080
 server.ssl.enabled=false
 server.ssl.certificate=classpath:certificate-ec.crt
 server.ssl.certificate-private-key=classpath:private-ec-key.pem
-# Профили через запятую для управления поведением приложения. Описаны выше. 
-spring,profiles,active=
 # Название БД и пользователь, под которым будет создана новая база данных и все необходимые таблицы.
 spring.datasource.db-name=santa-db
 spring.datasource.username=admin
